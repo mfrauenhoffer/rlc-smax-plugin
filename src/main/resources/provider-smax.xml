@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd
+         http://www.springframework.org/schema/util
+         http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+       default-lazy-init="true">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.microfocus.rlc.plugin"/>
+
+    <bean name="sampleGetFieldValueDispatcher" class="com.serena.rlc.provider.fieldvalue.GetFieldValueDispatcher"/>
+
+    <bean name="psaFactory" class="com.serena.rlc.provider.spi.ProviderSpecificationAwareFactoryImpl">
+        <constructor-arg value="provider-specifications.xml"/>
+    </bean>
+
+    <bean class="com.serena.rlc.provider.spi.ProviderSpecificationAware" factory-method="createProviderSpecificationAware"
+          factory-bean="psaFactory">
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="order">
+            <value>1</value>
+        </property>
+    </bean>
+
+    <bean id="smaxEntityProvider" class="com.microfocus.rlc.plugin.SmaxEntityProvider" scope="prototype" >
+        <property name="serverUrl" value="${server_url}"/>
+        <property name="userName" value="${integration_username}" />
+        <property name="password" value="${integration_password}" />
+        <property name="tenantId" value="${tenant_id}" />
+        <property name="entityType" value="${entityType}" />
+        <property name="entityTitleParam" value="${entityTitle}" />
+        <property name="entityDescParam" value="${entityDescription}" />
+        <property name="entityCreationTimestampParam" value="${createdOn}" />
+        <property name="entityCreatorParam" value="${createdBy}" />
+    </bean>
+    <bean id="smaxExecutionServiceProvider" class="com.microfocus.rlc.plugin.SmaxExecutionServiceProvider" scope="prototype" >
+        <property name="serverUrl" value="${server_url}"/>
+        <property name="userName" value="${integration_username}" />
+        <property name="password" value="${integration_password}" />
+        <property name="tenantId" value="${tenant_id}" />
+        <property name="entityType" value="${entityType}" />
+        <property name="entityTitleParam" value="${entityTitle}" />
+        <property name="entityDescParam" value="${entityDescription}" />
+        <property name="entityCreationTimestampParam" value="${createdOn}" />
+        <property name="entityCreatorParam" value="${createdBy}" />
+        <property name="pollingInterval" value="${polling_interval}"/>
+
+    </bean>
+
+</beans>

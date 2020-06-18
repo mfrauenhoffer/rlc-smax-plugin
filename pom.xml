@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.microfocus.rlc.plugin</groupId>
+    <artifactId>rlc-provider-smax</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>RLC Provider for SMAX</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <rlc-provider-spi.version>6.2.5.0-SNAPSHOT</rlc-provider-spi.version>
+        <org.slf4j.version>1.7.5</org.slf4j.version>
+        <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
+        <commons-lang3.version>3.1</commons-lang3.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.serena.rlc</groupId>
+            <artifactId>rlc-provider-spi</artifactId>
+            <version>${rlc-provider-spi.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+        
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${org.slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+                <version>3.8.1</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Minimum-RLC-Version>6.2.0</Minimum-RLC-Version>
+                            <Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+                            <Plugin-Name>rlc-provider-smax</Plugin-Name>
+                            <Plugin-Version>1.0</Plugin-Version>
+                            <Plugin-Display-Name>Micro Focus SMAX</Plugin-Display-Name>
+                            <Plugin-Description>Micro Focus SMAX</Plugin-Description>
+                            <Plugin-Info>Micro Focus SMAX</Plugin-Info>
+                            <Root-Context>provider-smax.xml</Root-Context>
+                            <All-Context-List>provider-smax.xml</All-Context-List>
+                            <Notify-Context>provider-smax</Notify-Context>
+                        </manifestEntries>
+                    </archive>
+                    <!-- Don't want Dimensions CM metadata in JAR -->
+                    <excludes>
+                        <exclude>**/.dm</exclude>
+                        <exclude>**/.dm/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>   
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.springframework:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

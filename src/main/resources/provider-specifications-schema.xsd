@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="providerSpecifications" type="providerSpecificationAwareImpl"/>
+    
+    <xs:complexType name="providerSpecificationAwareImpl">
+        <xs:sequence>
+            <xs:element name="providerDescription" type="xs:string"/>
+            <xs:element name="providerSpecifications" type="providerSpecification" maxOccurs="unbounded"/>
+            <xs:element name="baseProviderSpecification" type="baseProviderSpecification"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="providerSpecification">
+        <xs:all>
+            <xs:element name="providerKey" type="xs:string" minOccurs="1"/>
+            <xs:element name="internalName" type="xs:string" minOccurs="1"/>
+            <xs:element name="name" type="xs:string" minOccurs="1"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="contextName" type="xs:string" minOccurs="1"/>
+            <xs:element name="order" type="xs:int" minOccurs="0"/>
+            <xs:element name="canValidate" type="xs:boolean" default="false" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="baseProviderSpecification">
+        <xs:all>
+            <xs:element name="providerKey" type="xs:string" minOccurs="1"/>
+            <xs:element name="canValidate" type="xs:boolean" default="false" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+</xs:schema>

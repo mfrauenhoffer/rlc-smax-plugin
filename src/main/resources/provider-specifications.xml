@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<providerSpecifications xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:noNamespaceSchemaLocation="provider-specifications-schema.xsd">
+
+    <providerDescription>SMAX RLC Provider plugin</providerDescription>
+    <providerSpecifications>
+        <providerKey>smaxEntityProvider</providerKey>
+        <internalName>smaxEntityProvider</internalName>
+        <name>SMAX Integration Entity Provider</name>
+        <description>SMAX Integration Entity provider</description>
+        <contextName>provider-smax.xml</contextName>
+        <order>1</order>
+        <canValidate>true</canValidate>
+    </providerSpecifications>
+    <providerSpecifications>
+        <providerKey>smaxExecutionServiceProvider</providerKey>
+        <internalName>smaxExecutionServiceProvider</internalName>
+        <name>SMAX Entity Execution Provider</name>
+        <description>Perform actions on SMAX Items</description>
+        <contextName>provider-smax.xml</contextName>
+        <order>2</order>
+        <canValidate>true</canValidate>
+    </providerSpecifications>
+    <baseProviderSpecification>
+        <providerKey>smaxEntityProvider</providerKey>
+        <canValidate>true</canValidate>
+    </baseProviderSpecification>
+</providerSpecifications>
