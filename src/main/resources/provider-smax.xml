@@ -14,8 +14,6 @@
     <context:annotation-config/>
     <context:component-scan base-package="com.microfocus.rlc.plugin"/>
 
-    <bean name="sampleGetFieldValueDispatcher" class="com.serena.rlc.provider.fieldvalue.GetFieldValueDispatcher"/>
-
     <bean name="psaFactory" class="com.serena.rlc.provider.spi.ProviderSpecificationAwareFactoryImpl">
         <constructor-arg value="provider-specifications.xml"/>
     </bean>
@@ -53,7 +51,6 @@
         <property name="entityCreationTimestampParam" value="${createdOn}" />
         <property name="entityCreatorParam" value="${createdBy}" />
         <property name="pollingInterval" value="${polling_interval}"/>
-
     </bean>
 
 </beans>

@@ -58,7 +58,7 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
     public ProviderInfoResult findIntegrationEntities(List<Field> properties, Long startIndex,
             Long resultCount) throws ProviderException {
         List<String> propertyLayout = new ArrayList<>();
-        propertyLayout.add(getEntityTitleParam());
+        propertyLayout.add(getEntityTitl0eParam());
         propertyLayout.add(getEntityDescParam());
         propertyLayout.add(getEntityCreatorParam());
         propertyLayout.add(getEntityCreationTimestampParam());
@@ -72,7 +72,7 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
         return new ProviderInfoResult(0, resultsList.size(), resultsList.toArray(new ProviderInfo[resultsList.size()]));
     }
 
-    @Action(name = CREATE_INTEGRATION_ENTITY, displayName = "Create")
+    @Action(name = CREATE_INTEGRATION_ENTITY, displayName = "Create SMAX Item")
     public ProviderInfoResult createIntegrationEntity(String action, List<Field> properties) {
         return null;
     }

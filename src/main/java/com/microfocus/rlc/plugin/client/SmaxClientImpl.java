@@ -5,7 +5,7 @@ import com.microfocus.rlc.plugin.domain.SmaxAuthenticationRequest;
 import com.microfocus.rlc.plugin.domain.SmaxEntity;
 import com.microfocus.rlc.plugin.domain.SmaxQueryResult;
 import com.microfocus.rlc.plugin.utils.LocalHttpClient;
-import com.serena.rlc.provider.annotations.Service;
+import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 
-@Service(name = "SmaxClient")
+@Service
 public class SmaxClientImpl implements SmaxClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SmaxClientImpl.class);

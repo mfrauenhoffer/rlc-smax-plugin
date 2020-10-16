@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/rlc-provider-smax.iml" filepath="$PROJECT_DIR$/rlc-provider-smax.iml" />
-      <module fileurl="file://$PROJECT_DIR$/smaxPlugin.iml" filepath="$PROJECT_DIR$/smaxPlugin.iml" />
     </modules>
   </component>
 </project>
