@@ -1,6 +1,8 @@
 package com.microfocus.rlc.plugin.client;
 
+import com.microfocus.rlc.plugin.domain.SmaxBulkOperationResult;
 import com.microfocus.rlc.plugin.domain.SmaxEntity;
+import com.microfocus.rlc.plugin.domain.SmaxEntityOperation;
 
 import java.util.List;
 
@@ -12,4 +14,5 @@ public interface SmaxClient {
 
     SmaxEntity getRecord(String serverUrl, String tenantId, String sessionId, String entityType, List<String> propertyLayout, String entityId);
 
+    SmaxBulkOperationResult createSmaxRecord(String serverUrl, String tenantId, String sessionId, SmaxEntityOperation create);
 }

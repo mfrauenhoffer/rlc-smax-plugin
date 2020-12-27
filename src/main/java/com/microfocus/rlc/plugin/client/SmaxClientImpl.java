@@ -1,9 +1,8 @@
 package com.microfocus.rlc.plugin.client;
 
 import com.google.gson.Gson;
-import com.microfocus.rlc.plugin.domain.SmaxAuthenticationRequest;
-import com.microfocus.rlc.plugin.domain.SmaxEntity;
-import com.microfocus.rlc.plugin.domain.SmaxQueryResult;
+import com.google.gson.GsonBuilder;
+import com.microfocus.rlc.plugin.domain.*;
 import com.microfocus.rlc.plugin.utils.LocalHttpClient;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
@@ -61,11 +60,23 @@ public class SmaxClientImpl implements SmaxClient {
         return SmaxQueryResult.parse(LocalHttpClient.doGET(url, requestHeaders)).get(0);
     }
 
+    @Override
+    public SmaxBulkOperationResult createSmaxRecord(String serverUrl, String tenantId, String sessionId, SmaxEntityOperation operation) {
+        String url = serverUrl + REST_PATH + tenantId + EMS_PATH + "bulk/";
+
+        HashMap<String, String> requestHeaders = new HashMap<>();
+        requestHeaders.put(REQUEST_CONTENT_TYPE, APPLICATION_JSON);
+        requestHeaders.put(REQUEST_COOKIE_HEADER, SESSION_COOKIE_KEY + "=" + sessionId);
+
+        String requestBody = new GsonBuilder().create().toJson(operation);
+        logger.debug("in SmaxClientImpl::createSmaxRecord() - requestBody = " + requestBody);
+        return SmaxBulkOperationResult.parse(LocalHttpClient.doPOST(url, requestHeaders, requestBody));
+    }
+
     private String generateLayoutString(List<String> propertyList) {
         String layout = "";
         for (String property : propertyList) {
             layout = layout + property + ",";
-            logger.debug("layout String: " + layout);
         }
         layout = StringUtils.chop(layout);
         logger.debug("Layout string completed: " + layout);

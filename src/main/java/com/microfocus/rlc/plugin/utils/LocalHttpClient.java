@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 public class LocalHttpClient {
@@ -22,9 +23,7 @@ public class LocalHttpClient {
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             if (headers.size() > 0) {
-                headers.forEach((key, val) -> {
-                    connection.addRequestProperty(key, val);
-                });
+                headers.forEach(connection::addRequestProperty);
             }
             int responseCode = connection.getResponseCode();
             logger.debug("REST Call Response Code: " + responseCode);
@@ -35,7 +34,7 @@ public class LocalHttpClient {
                 in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
             }
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine.trim());
             }
@@ -50,20 +49,18 @@ public class LocalHttpClient {
         return null;
     }
 
-    public static String doPOST(String urlString, HashMap<String, String> headers, String requestBody) {
+    public static java.lang.String doPOST(String urlString, HashMap<String, String> headers, String requestBody) {
         try {
             URL url = new URL(urlString);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             if (headers.size() > 0) {
-                headers.forEach((key, val) -> {
-                    connection.addRequestProperty(key, val);
-                });
+                headers.forEach(connection::addRequestProperty);
             }
             connection.setDoOutput(true);
 
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] httpBody = requestBody.getBytes("utf-8");
+                byte[] httpBody = requestBody.getBytes(StandardCharsets.UTF_8);
                 os.write(httpBody, 0, httpBody.length);
                 logger.debug("Wrote output stream body. Content length: " + httpBody.length);
             } catch (Exception e) {
@@ -71,17 +68,26 @@ public class LocalHttpClient {
             }
 
             int responseCode = connection.getResponseCode();
-            logger.debug("Authentication Response Code: " + responseCode);
+            logger.debug("POST Response Code: " + responseCode);
             if (responseCode < 300) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String inputLine;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine.trim());
                 }
                 in.close();
                 logger.debug(response.toString());
                 return response.toString();
+            } else {
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine.trim());
+                }
+                in.close();
+                logger.debug("ErrorStream Contents: " + response.toString());
             }
         } catch (Exception e) {
             logger.error("Error in Executing POST Request: " + e.getMessage());

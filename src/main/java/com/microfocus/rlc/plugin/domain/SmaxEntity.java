@@ -6,7 +6,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.*;
 
 public class SmaxEntity {
 
@@ -19,7 +19,7 @@ public class SmaxEntity {
     public static final String ENTITY_CREATION_DATE_KEY = "createdOn";
     public static final String ENTITY_CREATED_BY_KEY = "createdBy";
     public static final String ENTITY_ADDITIONAL_PARAMS_KEY = "entityAddtlParamsToReturn";
-    
+
     @SerializedName("entity_type")
     private String entityType;
 
@@ -33,6 +33,8 @@ public class SmaxEntity {
     private String entityTitle;
 
     public SmaxEntity() {
+        entity_properties = new HashMap<String, Object>();
+        entity_related_properties = new HashMap<String, Object>();
     }
 
     public String getEntityId() {
@@ -52,21 +54,31 @@ public class SmaxEntity {
         return entityTitle;
     }
 
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
     public String getEntityType() {
         return entityType;
     }
 
     public String getPropertyAsString(String key) {
+        String returnVal = "";
         if (key.contains(".")) {
-            // Need to split the key to two seperate keys
+            // Need to split the key to two separate keys
             //logger.debug("Key contains . character; actual key = " + key);
             String keyArray[] = key.split("\\.");
-            //logger.debug("keyArray has following capacity: " + keyArray.length);
+            logger.debug("keyArray has following capacity: " + keyArray.length);
+            if (entity_related_properties.isEmpty()) {
+                return
+            }
             Object containerKeyObject = entity_related_properties.get(keyArray[0]);
-            return ((LinkedTreeMap) containerKeyObject).get(keyArray[1]).toString();
+            returnVal = ((LinkedTreeMap) containerKeyObject).get(keyArray[1]).toString();
         } else {
-            return entity_properties.get(key).toString();
+            if (!entity_properties.get(key).toString().isEmpty()) {
+                returnVal = entity_properties.get(key).toString();
+            }
         }
+        return returnVal;
     }
 
     public Long getPropertyAsLong(String key) {
@@ -85,5 +97,8 @@ public class SmaxEntity {
         return null;
     }
 
+    public void setEntityProperty(String propertyName, Object propertyValue) {
+        entity_properties.put(propertyName, propertyValue);
+    }
 
 }

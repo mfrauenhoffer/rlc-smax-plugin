@@ -1,16 +1,11 @@
 package com.microfocus.rlc.plugin;
 
+import com.microfocus.rlc.plugin.domain.SmaxBulkOperationResult;
 import com.microfocus.rlc.plugin.domain.SmaxEntity;
-import com.microfocus.rlc.plugin.domain.SmaxEntityProperty;
+import com.microfocus.rlc.plugin.domain.SmaxEntityOperation;
 import com.microfocus.rlc.plugin.domain.SmaxSession;
-import com.serena.rlc.provider.annotations.Action;
-import com.serena.rlc.provider.annotations.ConfigProperty;
-import com.serena.rlc.provider.annotations.Params;
-import com.serena.rlc.provider.annotations.Service;
-import com.serena.rlc.provider.domain.DataType;
-import com.serena.rlc.provider.domain.Field;
-import com.serena.rlc.provider.domain.ProviderInfo;
-import com.serena.rlc.provider.domain.ProviderInfoResult;
+import com.serena.rlc.provider.annotations.*;
+import com.serena.rlc.provider.domain.*;
 import com.serena.rlc.provider.exceptions.ProviderException;
 import com.serena.rlc.provider.spi.IIntegrationEntityProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.microfocus.rlc.plugin.domain.SmaxEntity.*;
+
 public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IIntegrationEntityProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(SmaxEntityProvider.class);
@@ -28,18 +25,10 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
 
     @ConfigProperty(name = SmaxEntity.ENTITY_ADDITIONAL_PARAMS_KEY, displayName = "Additional Entity Fields to Return",
                     description = "Insert field names defined in SMAX that you wish to retrieve. These must be in the following format: fieldName:displayName:dataTypeInSmax", defaultValue = "", dataType = DataType.TEXTAREA)
-    private String entityAddtlParams;
-
-    private Map<String, SmaxEntityProperty> entityParamsMap;
+    private String strEntityAddtlParams;
 
     public String getEntityAddtlParams() {
-        return entityAddtlParams;
-    }
-
-    public void setEntityAddtlParams(String entityAddtlParams) {
-        this.entityAddtlParams = entityAddtlParams;
-        // Parse parameters in to easily accessible map
-        parseAddtlSmaxProperties();
+        return strEntityAddtlParams;
     }
 
     @Override
@@ -58,7 +47,7 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
     public ProviderInfoResult findIntegrationEntities(List<Field> properties, Long startIndex,
             Long resultCount) throws ProviderException {
         List<String> propertyLayout = new ArrayList<>();
-        propertyLayout.add(getEntityTitl0eParam());
+        propertyLayout.add(getEntityTitleParam());
         propertyLayout.add(getEntityDescParam());
         propertyLayout.add(getEntityCreatorParam());
         propertyLayout.add(getEntityCreationTimestampParam());
@@ -73,8 +62,50 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
     }
 
     @Action(name = CREATE_INTEGRATION_ENTITY, displayName = "Create SMAX Item")
-    public ProviderInfoResult createIntegrationEntity(String action, List<Field> properties) {
-        return null;
+    @Params(params = {
+            @Param(fieldName = ENTITY_TITLE_KEY, displayName = "Title", description = "Specify the value of the Title field", required = true, dataType = DataType.TEXT),
+            @Param(fieldName = ENTITY_DESCRIPTION_KEY, displayName = "Description", description = "Specify the value of the Description field", required = true, dataType = DataType.TEXTAREA),
+            @Param(fieldName = ENTITY_ADDITIONAL_PARAMS_KEY, displayName = "Additional Field Values", description = "propertyName1:propertyValue1,propertyName2:propertyValue2", dataType = DataType.TEXTAREA)
+    })
+    public ProviderInfoResult createIntegrationEntity(String action, List<Field> properties) throws ProviderException {
+        try {
+            SmaxEntity entity = new SmaxEntity();
+            entity.setEntityType(getEntityType());
+            entity.setEntityProperty(getEntityTitleParam(), Field.getFieldByName(properties, ENTITY_TITLE_KEY).getValue());
+            entity.setEntityProperty(getEntityDescParam(), Field.getFieldByName(properties, ENTITY_DESCRIPTION_KEY).getValue());
+
+            if (!Field.getFieldByName(properties, ENTITY_ADDITIONAL_PARAMS_KEY).getValue().isEmpty()) {
+                List<String> additionalFields;
+                additionalFields = Arrays.asList(Field.getFieldByName(properties, ENTITY_ADDITIONAL_PARAMS_KEY).getValue().split(","));
+                for (String field : additionalFields) {
+                    String[] propertySplit = field.split(":");
+                    entity.setEntityProperty(propertySplit[0], propertySplit[1]);
+                }
+            }
+            ArrayList<SmaxEntity> smaxEntityArrayList = new ArrayList<>();
+            smaxEntityArrayList.add(entity);
+            SmaxSession session = new SmaxSession(client.startSmaxSession(getServerUrl(), getTenantId(), getUserName(), getPassword()));
+            logger.debug("In SmaxEntityProvider:createIntegrationEntity(), SMAX Session ID: " + session.getSessionId());
+            SmaxBulkOperationResult results = client.createSmaxRecord(getServerUrl(), getTenantId(), session.getSessionId(), new SmaxEntityOperation(smaxEntityArrayList, "CREATE"));
+            if (!results.getOperationResultStatus().equals("OK")) {
+                throw new ProviderException(String.format("Create operation failed in SMAX, received BulkOperationResultStatus of %s from REST call", results.getOperationResultStatus()));
+            }
+            // Now we need to recreate the SMAX Entity object because SMAX doesn't return all the properties we need right off the bat.
+            List<ProviderInfo> providerInfos = new ArrayList<>();
+            ProviderInfo newEntityProviderInfo = getIntegrationEntity(new Field(ENTITY_ID_KEY, "ID", results.getSmaxEntityId()));
+            if (newEntityProviderInfo == null) {
+                throw new ProviderException("Error creating ProviderInfo object for new record");
+            }
+            providerInfos.add(newEntityProviderInfo);
+            if (providerInfos.isEmpty()) {
+                throw new ProviderException("In SmaxEntityProvider::createIntegrationEntity - No ProviderInfo object in providerInfos");
+            } else {
+                logger.debug("In SmaxEntityProvider::createIntegrationEntity - ProviderInfo object created and added to ArrayList successfully.");
+            }
+            return new ProviderInfoResult(0, providerInfos.size(), providerInfos.toArray(new ProviderInfo[providerInfos.size()]));
+        } catch (Exception e) {
+            throw new ProviderException("In SmaxEntityProvider::createIntegrationEntity - An error occurred: ", e.getCause());
+        }
     }
 
     @Override
@@ -91,11 +122,10 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
     }
 
     private ProviderInfo createProviderInfo(SmaxEntity entity) {
-        // logger.debug("In SmaxEntityProvider::createProviderInfo() for entity ID: " +
-        // entity.getEntityId());
-        final String itemUrl = getServerUrl() + "/saw/" + getEntityType() + "/" + entity.getEntityId()
+        logger.debug("In SmaxEntityProvider::createProviderInfo() for entity ID: " + entity.getEntityId());
+        String itemUrl = getServerUrl() + "/saw/" + getEntityType() + "/" + entity.getEntityId()
                 + "?TENANTID=" + getTenantId();
-        final ProviderInfo provInfo = new ProviderInfo(entity.getEntityId(),
+        ProviderInfo provInfo = new ProviderInfo(entity.getEntityId(),
                 entity.getPropertyAsString(getEntityTitleParam()), entity.getEntityType(),
                 entity.getPropertyAsString(getEntityTitleParam()), itemUrl);
         provInfo.setDescription(entity.getPropertyAsString(getEntityDescParam()));
@@ -103,34 +133,29 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
         List<Field> fields = new ArrayList<>();
         addField(fields, SmaxEntity.ENTITY_CREATION_DATE_KEY, "Created On",
                 entity.getPropertyAsLong(getEntityCreationTimestampParam()).toString(), DataType.DATETIME);
-        addField(fields, SmaxEntity.ENTITY_CREATED_BY_KEY, "Created By", entity.getPropertyAsString(getEntityCreatorParam()),
-                DataType.TEXT);
+        addField(fields, SmaxEntity.ENTITY_CREATED_BY_KEY, "Created By",
+                entity.getPropertyAsString(getEntityCreatorParam()), DataType.TEXT);
 
         provInfo.setProperties(fields);
+        logger.debug("In SmaxEntityProvider::createProviderInfo() - Completed populating ProviderInfo object");
         return provInfo;
     }
 
     private void addField(List<Field> fieldCollection, String fieldName, String fieldDisplayName,
             String fieldValue, DataType dataType) {
+        logger.debug("In SmaxEntityProvider::addField()");
         if (StringUtils.isNotEmpty(fieldValue)) {
+            logger.debug("In SmaxEntityProvider::addField() - " + fieldName + " has value of " + fieldValue);
             Field fieldToAdd = new Field(fieldName, fieldDisplayName);
             fieldToAdd.setValue(fieldValue);
             fieldToAdd.setType(dataType);
-            fieldCollection.add(fieldToAdd);
-        }
-    }
-
-    private void parseAddtlSmaxProperties() {
-        List<String> values = new ArrayList<String>();
-        // Handle the
-
-        values = Arrays.asList(getEntityAddtlParams().split(","));
-
-        for (String property : values) {
-            String[] propertySplit = property.split(":");
-            if (propertySplit.length > 0) {
-                entityParamsMap.put(propertySplit[0], new SmaxEntityProperty(propertySplit[0], propertySplit[1], propertySplit[2]));
+            if (!fieldCollection.add(fieldToAdd)) {
+                logger.debug("Could not add field to FieldCollection");
+            } else {
+                logger.debug("Field added to fieldCollection");
             }
+        } else {
+            logger.debug("In SmaxEntityProvider::addField() - " + fieldName + " has empty fieldValue.");
         }
     }
 }

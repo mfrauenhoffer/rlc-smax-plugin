@@ -21,7 +21,7 @@ public class SmaxQueryResult {
 	public static List<SmaxEntity> parse(String json) {
         logger.debug("In SmaxQueryResult#parse()");
         logger.debug("Begun parsing JSON");
-        logger.debug("JSON Repose to Parse: " + json);
+        logger.debug("JSON Response to Parse: " + json);
         Gson gson = new Gson();
         SmaxQueryResult results = gson.fromJson(json, SmaxQueryResult.class);
         

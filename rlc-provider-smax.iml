@@ -10,10 +10,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Micro Focus/Release Control/SDK/lib/rlc-provider-spi-6.2.6.0-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../Program Files/Micro Focus/Release Control/SDK/lib/rlc-provider-spi-6.2.7.0-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

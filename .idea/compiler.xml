@@ -11,6 +11,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="rlc-provider-smax" target="1.8" />
+      <module name="rlc-provider-smax (1)" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
