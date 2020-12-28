@@ -104,7 +104,8 @@ public class SmaxEntityProvider extends SmaxBaseServiceProvider implements IInte
             }
             return new ProviderInfoResult(0, providerInfos.size(), providerInfos.toArray(new ProviderInfo[providerInfos.size()]));
         } catch (Exception e) {
-            throw new ProviderException("In SmaxEntityProvider::createIntegrationEntity - An error occurred: ", e.getCause());
+            e.printStackTrace();
+            throw new ProviderException("Error occurred in createIntegrationEntity.");
         }
     }
 

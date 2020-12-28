@@ -57,6 +57,7 @@ public class SmaxEntity {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
+
     public String getEntityType() {
         return entityType;
     }
@@ -69,10 +70,11 @@ public class SmaxEntity {
             String keyArray[] = key.split("\\.");
             logger.debug("keyArray has following capacity: " + keyArray.length);
             if (entity_related_properties.isEmpty()) {
-                return
+                returnVal = "";
+            } else {
+                Object containerKeyObject = entity_related_properties.get(keyArray[0]);
+                returnVal = ((LinkedTreeMap) containerKeyObject).get(keyArray[1]).toString();
             }
-            Object containerKeyObject = entity_related_properties.get(keyArray[0]);
-            returnVal = ((LinkedTreeMap) containerKeyObject).get(keyArray[1]).toString();
         } else {
             if (!entity_properties.get(key).toString().isEmpty()) {
                 returnVal = entity_properties.get(key).toString();

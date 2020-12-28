@@ -7,19 +7,20 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Micro Focus/Release Control/SDK/lib/rlc-provider-spi-6.2.7.0-SNAPSHOT.jar!/" />
+          <root url="jar:///Users/Program Files/Micro Focus/Release Control/SDK/lib/rlc-provider-spi-6.2.6.0-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="rlc-provider-spi-6.2.6.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="rlc-provider-spi-6.2.7.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.serena.rlc:rlc-provider-spi:6.2.7.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.6" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
